@@ -1,0 +1,65 @@
+/*
+ * Distribution Statement
+ *
+ * This computer software has been developed under sponsorship of the United States Air Force Research Lab. Any further
+ * distribution or use by anyone or any data contained therein, unless otherwise specifically provided for,
+ * is prohibited without the written approval of AFRL/RQVC-MSTC, 2210 8th Street Bldg 146, Room 218, WPAFB, OH  45433
+ *
+ * Disclaimer
+ *
+ * This material was prepared as an account of work sponsored by an agency of the United States Government. Neither
+ * the United States Government nor the United States Air Force, nor any of their employees, makes any warranty,
+ * express or implied, or assumes any legal liability or responsibility for the accuracy, completeness, or usefulness
+ * of any information, apparatus, product, or process disclosed, or represents that its use would not infringe privately
+ * owned rights.
+ */
+
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+group = 'mstc.model'
+version = '1.0'
+
+String hostName = InetAddress.getLocalHost().getHostName()
+/* Setup repositories */
+repositories {
+    mavenLocal()
+    maven { url "http://www.rio-project.org/maven2" }
+    mavenCentral()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    /*repositories {
+        if (enclave) {
+            maven { url "http://10.131.7.138:7001" }
+        }
+    }*/
+}
+
+dependencies {
+    compile gradleApi()
+    compile "com.github.javaparser:javaparser-core:2.5.1"
+    testCompile "junit:junit:4.12"
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+test {
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+    systemProperty "java.source", "../mstc-engineering-open/products/AstrosNastranMultifidelityModel-mdl/src/main/java/mil/afrl/mstc/open/astrosnastranmultifidelitymodel/AstrosNastranMultifidelityModel2.java"
+}
